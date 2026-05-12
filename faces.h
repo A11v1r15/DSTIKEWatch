@@ -74,6 +74,18 @@ public:
 
       // Exibir IP
       display.setTextSize(1);
+      if (rtcAvailable) {
+        DateTime now = rtc.now();
+        display.setCursor(0, 45);
+        if (now.hour() < 10) display.print("0");
+        display.print(now.hour());
+        display.print(":");
+        if (now.minute() < 10) display.print("0");
+        display.print(now.minute());
+        display.print(":");
+        if (now.second() < 10) display.print("0");
+        display.print(now.second());
+      }
       display.setCursor(0, 55);
       if (WiFi.status() == WL_CONNECTED) {
         display.println(WiFi.localIP());
@@ -145,9 +157,23 @@ public:
         // Mostrar valor configurado
         display.setTextSize(3);
         display.setCursor(0, 30);
-        if (minutes < 10) display.print("0");
-        display.print(minutes);
-        display.println(":00");
+        display.print(minutes >= 60 ? "01:" : "00:");
+        if (minutes % 60 < 10) display.print("0");
+        display.print(minutes % 60);
+        // Mostrar hora final
+        if (rtcAvailable) {
+          DateTime later = rtc.now() + TimeSpan(0, 0, minutes, 0);
+          display.setCursor(0, 55);
+          display.setTextSize(1);
+          if (later.hour() < 10) display.print("0");
+          display.print(later.hour());
+          display.print(":");
+          if (later.minute() < 10) display.print("0");
+          display.print(later.minute());
+          display.print(":");
+          if (later.second() < 10) display.print("0");
+          display.print(later.second());
+        }
       }
 
       display.display();
@@ -227,11 +253,13 @@ public:
   void action(bool wasHold) override {
     if (!wasHold) led = !led;
     digitalWrite(WHITE_LED_PIN, !led);
+    setRGBLed(0xFFFFFF, led ? 255 : 0);
   }
 
   void exit() override {
     led = false;
     digitalWrite(WHITE_LED_PIN, HIGH);
+    setRGBLed();
   }
 };
 
@@ -313,7 +341,12 @@ public:
 
       if (col == 0 || isHoliday(d, month + 1)) {
         // domingo: inverter cores
-        display.fillRect(x, y, 16, 8, SH110X_WHITE);
+        if (d == now.day() && month == now.month() - 1) {
+          display.fillRect(x, y, 16, 8, SH110X_BLACK);
+          display.fillRect(x + 1, y + 1, 14, 6, SH110X_WHITE);
+        } else {
+          display.fillRect(x, y, 16, 8, SH110X_WHITE);
+        }
         display.setTextColor(SH110X_BLACK);
         display.setCursor(x + offsetX, y);
         display.print(d);
@@ -382,7 +415,7 @@ private:
   bool paused = false;
   unsigned long lastMove = 0;
   int score = 0;
-  int hScore = 0;
+  int hScore;
 
 public:
   SnakeFace() {
@@ -391,6 +424,7 @@ public:
 
   void resetGame() {
     hScore = max(score, hScore);
+    preferences.putInt("hScore", hScore);
     snakeLen = 7;
     for (int i = 0; i < 7; i++) {
       snake[i] = { GRID_W / 2 - i, GRID_H / 2 };
@@ -566,5 +600,13 @@ public:
     }
   }
 
-  void exit() override {}
+  void enter() override {
+    tone(BUZZER_PIN, 600, 100);
+    preferences.begin("snake", false);
+    hScore = preferences.getInt("hScore", 0);
+  }
+
+  void exit() override {
+    preferences.end();
+  }
 };

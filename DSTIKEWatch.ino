@@ -8,7 +8,7 @@
 #include <Adafruit_NeoPixel.h>
 #include <ArduinoOTA.h>
 #include "RTClib.h"
-#include "secrets.h"  // STASSID STAPSK OTA_PASSWORD WEATHER_API_KEY GOOGLE_API_KEY
+#include "secrets.h"  // STASSID STAPSK OTA_PASSWORD
 #include "faces.h"
 
 Face* currentFace = new MainFace();

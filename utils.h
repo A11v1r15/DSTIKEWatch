@@ -1,4 +1,7 @@
 #include "consts.h"
+#include <Preferences.h>
+Preferences preferences;
+
 
 void setRGBLed(int r, int g, int b, int l) {
   strip.clear();
@@ -130,7 +133,7 @@ String weekday(int weekday) {
     case 4: return "Quinta ";
     case 5: return "Sexta  ";
     case 6: return "Sabado ";
-    default: return "Desconhecido";
+    default: return"Que dia";
   }
 }
 
