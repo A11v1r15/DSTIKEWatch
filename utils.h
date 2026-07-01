@@ -433,4 +433,13 @@ bool isHoliday(int day, int month) {
   return false;
 }
 
+void userInteraction() {
+	lastInteraction = millis();
+
+	if (displaySleeping) {
+		displaySleeping = false;
+		display.oled_command(SH110X_DISPLAYON);
+	}
+}
+
 #define setTimezone(tz) setenv("TZ", tz, 1); tzset()

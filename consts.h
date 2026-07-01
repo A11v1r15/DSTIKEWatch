@@ -55,6 +55,8 @@ bool displayAvailable = false;
 bool rtcAvailable = false;
 bool otaUpgrade = false;
 bool ntpInitialized = false;
+unsigned long lastInteraction = 0;
+bool displaySleeping = false;
 
 // Tratar eventos de botões
 bool upPressed;

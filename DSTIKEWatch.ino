@@ -10,6 +10,7 @@
 #include "RTClib.h"
 #include "secrets.h"  // STASSID STAPSK OTA_PASSWORD
 #include "faces.h"
+#define SH110X_NO_SPLASH
 
 Face* currentFace = new MainFace();
 
@@ -102,13 +103,24 @@ void loop() {
   // Alimentar o watchdog regularmente
   ESP.wdtFeed();
 
-  currentFace->show();
+  if (!displaySleeping)
+    currentFace->show();
   currentFace->update();
 
   // Tratar eventos de botões
   bool currentUp = !digitalRead(BUTTON_UP);
   bool currentDown = !digitalRead(BUTTON_DOWN);
   bool currentSelect = !digitalRead(BUTTON_SELECT);
+
+  if (!displaySleeping &&
+    millis() - lastInteraction >= 60000) {
+
+    displaySleeping = true;
+		display.oled_command(SH110X_DISPLAYOFF);
+  }
+
+  if (currentUp || currentDown || currentSelect)
+    userInteraction();
 
   if (currentUp) {
     currentFace = currentFace->handleUp(currentUp && upPressed);

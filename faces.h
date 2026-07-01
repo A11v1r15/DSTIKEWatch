@@ -3,48 +3,46 @@
 class MainFace : public Face {
 public:
   void show() override {
-    // Atualizar display
-    if (displayAvailable) {
-      display.clearDisplay();
-      display.setTextSize(1);
+  if (!displayAvailable) return;
+    display.clearDisplay();
+    display.setTextSize(1);
 
-      if (rtcAvailable) {
-        DateTime now = rtc.now();
+    if (rtcAvailable) {
+      DateTime now = rtc.now();
 
-        // Exibir data
-        display.setCursor(0, 0);
-        display.print(weekday(now.dayOfTheWeek()) + " ");
-        if (now.day() < 10) display.print("0");
-        display.print(now.day());
-        display.print("/");
-        if (now.month() < 10) display.print("0");
-        display.print(now.month());
-        display.print("/");
-        display.print(now.year() - 2000);
+      // Exibir data
+      display.setCursor(0, 0);
+      display.print(weekday(now.dayOfTheWeek()) + " ");
+      if (now.day() < 10) display.print("0");
+      display.print(now.day());
+      display.print("/");
+      if (now.month() < 10) display.print("0");
+      display.print(now.month());
+      display.print("/");
+      display.print(now.year() - 2000);
 
-        // Exibir hora
-        display.setCursor(6, 34);
-        display.setFont(&clockFont);
-        if (now.hour() < 10) display.print("0");
-        display.print(now.hour());
-        display.print(":");
-        if (now.minute() < 10) display.print("0");
-        display.print(now.minute());
-        display.setFont();
+      // Exibir hora
+      display.setCursor(6, 34);
+      display.setFont(&clockFont);
+      if (now.hour() < 10) display.print("0");
+      display.print(now.hour());
+      display.print(":");
+      if (now.minute() < 10) display.print("0");
+      display.print(now.minute());
+      display.setFont();
 
-        // Exibir segundos
-        display.setCursor(113, 34);
-        if (now.second() < 10) display.print("0");
-        display.println(now.second());
+      // Exibir segundos
+      display.setCursor(113, 34);
+      if (now.second() < 10) display.print("0");
+      display.println(now.second());
 
-        // Exibir fase da lua
-        display.setFont(&astralFont);
-        display.setCursor(121, 0);
-        display.print(moonPhase());
-        display.setFont();
-      }
-      display.display();
+      // Exibir fase da lua
+      display.setFont(&astralFont);
+      display.setCursor(121, 0);
+      display.print(moonPhase());
+      display.setFont();
     }
+    display.display();
   }
 
   Face* handleUp(bool wasHold) override {
@@ -64,38 +62,37 @@ public:
 class WiFiFace : public Face {
 public:
   void show() override {
-    // Atualizar display
-    if (displayAvailable) {
-      display.clearDisplay();
+    if (!displayAvailable) return;
+    display.clearDisplay();
 
-      display.setTextSize(5);
-      display.setCursor(0, 0);
-      display.println("WiFi");
+    display.setTextSize(5);
+    display.setCursor(0, 0);
+    display.println("WiFi");
 
-      // Exibir IP
-      display.setTextSize(1);
-      if (rtcAvailable) {
-        DateTime now = rtc.now();
-        display.setCursor(0, 45);
-        if (now.hour() < 10) display.print("0");
-        display.print(now.hour());
-        display.print(":");
-        if (now.minute() < 10) display.print("0");
-        display.print(now.minute());
-        display.print(":");
-        if (now.second() < 10) display.print("0");
-        display.print(now.second());
-      }
-      display.setCursor(0, 55);
-      if (WiFi.status() == WL_CONNECTED) {
-        display.println(WiFi.localIP());
-      } else {
-        display.println("Desconectado");
-      }
-
-      display.display();
+    // Exibir IP
+    display.setTextSize(1);
+    if (rtcAvailable) {
+      DateTime now = rtc.now();
+      display.setCursor(0, 45);
+      if (now.hour() < 10) display.print("0");
+      display.print(now.hour());
+      display.print(":");
+      if (now.minute() < 10) display.print("0");
+      display.print(now.minute());
+      display.print(":");
+      if (now.second() < 10) display.print("0");
+      display.print(now.second());
     }
+    display.setCursor(0, 55);
+    if (WiFi.status() == WL_CONNECTED) {
+      display.println(WiFi.localIP());
+    } else {
+      display.println("Desconectado");
+    }
+    display.display();
+  }
 
+  void update() override {
     server.handleClient();
   }
 
@@ -129,57 +126,54 @@ private:
 
 public:
   void show() override {
-    if (displayAvailable) {
-      display.clearDisplay();
+    if (!displayAvailable) return;
+    display.clearDisplay();
 
-      display.setTextSize(2);
-      display.setCursor(0, 0);
-      display.println("TIMER");
+    display.setTextSize(2);
+    display.setCursor(0, 0);
+    display.println("TIMER");
 
-      if (running && timerActive) {
-        // Mostrar tempo restante
-        unsigned long remaining = (timerEnd - millis()) / 1000;
-        int rMin = remaining / 60;
-        int rSec = remaining % 60;
+    if (running && timerActive) {
+      // Mostrar tempo restante
+      unsigned long remaining = (timerEnd - millis()) / 1000;
+      int rMin = remaining / 60;
+      int rSec = remaining % 60;
 
-        display.setTextSize(3);
-        display.setCursor(0, 30);
-        if (rMin <= 0 && rSec <= 0) {
-          display.print("ALARM");
-        } else {
-          if (rMin < 10) display.print("0");
-          display.print(rMin);
-          display.print(":");
-          if (rSec < 10) display.print("0");
-          display.print(rSec);
-        }
+      display.setTextSize(3);
+      display.setCursor(0, 30);
+      if (rMin <= 0 && rSec <= 0) {
+        display.print("ALARM");
       } else {
-        // Mostrar valor configurado
-        display.setTextSize(3);
-        display.setCursor(0, 30);
-        display.print(minutes >= 60 ? "01:" : "00:");
-        if (minutes % 60 < 10) display.print("0");
-        display.print(minutes % 60);
-        // Mostrar hora final
-        if (rtcAvailable) {
-          DateTime later = rtc.now() + TimeSpan(0, 0, minutes, 0);
-          display.setCursor(0, 55);
-          display.setTextSize(1);
-          if (later.hour() < 10) display.print("0");
-          display.print(later.hour());
-          display.print(":");
-          if (later.minute() < 10) display.print("0");
-          display.print(later.minute());
-          display.print(":");
-          if (later.second() < 10) display.print("0");
-          display.print(later.second());
-        }
+        if (rMin < 10) display.print("0");
+        display.print(rMin);
+        display.print(":");
+        if (rSec < 10) display.print("0");
+        display.print(rSec);
       }
-
-      display.display();
+    } else {
+      // Mostrar valor configurado
+      display.setTextSize(3);
+      display.setCursor(0, 30);
+      display.print(minutes >= 60 ? "01:" : "00:");
+      if (minutes % 60 < 10) display.print("0");
+      display.print(minutes % 60);
+      // Mostrar hora final
+      if (rtcAvailable) {
+        DateTime later = rtc.now() + TimeSpan(0, 0, minutes, 0);
+        display.setCursor(0, 55);
+        display.setTextSize(1);
+        if (later.hour() < 10) display.print("0");
+        display.print(later.hour());
+        display.print(":");
+        if (later.minute() < 10) display.print("0");
+        display.print(later.minute());
+        display.print(":");
+        if (later.second() < 10) display.print("0");
+        display.print(later.second());
+      }
     }
+    display.display();
   }
-
 
   void action(bool wasHold) override {
     if (!wasHold) {
@@ -234,20 +228,18 @@ private:
 
 public:
   void show() override {
-    if (displayAvailable) {
-      display.clearDisplay();
+    if (!displayAvailable) return;
+    display.clearDisplay();
 
-      display.setTextSize(6);
-      display.setCursor(0, 0);
+    display.setTextSize(6);
+    display.setCursor(0, 0);
 
-      if (led) {
-        display.println("ON");
-      } else {
-        display.println("OFF");
-      }
-
-      display.display();
+    if (led) {
+      display.println("ON");
+    } else {
+      display.println("OFF");
     }
+    display.display();
   }
 
   void action(bool wasHold) override {

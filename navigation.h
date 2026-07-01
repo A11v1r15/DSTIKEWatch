@@ -46,8 +46,8 @@ public:
   }
 
   // Método para executar a face atual
-  virtual void show() = 0;
-  virtual void action(bool wasHold) = 0;
-  virtual void exit() = 0;
+  virtual void show() {}
+  virtual void action(bool wasHold) {}
+  virtual void exit() {}
   virtual void update() {}
 };
